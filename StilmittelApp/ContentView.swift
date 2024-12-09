@@ -61,6 +61,28 @@ struct ContentView: View {
                                     Text("Erklärung: \(stilmittel.explanation)")
                                         .font(.subheadline)
                                         .padding()
+                                    
+                                    // Show thumbs up/down options
+                                    HStack {
+                                        Button(action: {
+                                            viewModel.knownCount += 1
+                                        }) {
+                                            Label("I knew it", systemImage: "hand.thumbsup.fill")
+                                                .padding()
+                                                .background(Color.blue.opacity(0.2))
+                                                .cornerRadius(8)
+                                        }
+                                        
+                                        Button(action: {
+                                            viewModel.unknownCount += 1
+                                        }) {
+                                            Label("I didn't", systemImage: "hand.thumbsdown.fill")
+                                                .padding()
+                                                .background(Color.red.opacity(0.2))
+                                                .cornerRadius(8)
+                                        }
+                                    }
+                                    .padding(.top)
                                 }
                             }
                         } else if selectedMode == .guessTermByExplanation {
@@ -79,6 +101,28 @@ struct ContentView: View {
                                     Text("Beispiel: \(stilmittel.example)")
                                         .font(.subheadline)
                                         .padding()
+                                    
+                                    // Show thumbs up/down options
+                                    HStack {
+                                        Button(action: {
+                                            viewModel.knownCount += 1
+                                        }) {
+                                            Label("I knew it", systemImage: "hand.thumbsup.fill")
+                                                .padding()
+                                                .background(Color.blue.opacity(0.2))
+                                                .cornerRadius(8)
+                                        }
+                                        
+                                        Button(action: {
+                                            viewModel.unknownCount += 1
+                                        }) {
+                                            Label("I didn't", systemImage: "hand.thumbsdown.fill")
+                                                .padding()
+                                                .background(Color.red.opacity(0.2))
+                                                .cornerRadius(8)
+                                        }
+                                    }
+                                    .padding(.top)
                                 }
                             }
                         }
@@ -111,6 +155,14 @@ struct ContentView: View {
                         }
                     }
                     .padding()
+                    
+                    // Display known/unknown counts
+                    HStack {
+                        Text("Known: \(viewModel.knownCount)")
+                            .padding(.trailing, 20)
+                        Text("Unknown: \(viewModel.unknownCount)")
+                    }
+                    .padding(.bottom)
                 }
             }
             .navigationTitle("Stilmittel Lernen")
@@ -122,8 +174,4 @@ struct ContentView: View {
             }
         }
     }
-}
-
-#Preview {
-    ContentView()
 }

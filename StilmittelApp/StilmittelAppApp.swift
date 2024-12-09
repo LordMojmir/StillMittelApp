@@ -6,8 +6,6 @@
 //
 
 import SwiftUI
-// Remove SwiftData if not needed
-// import SwiftData
 
 @main
 struct StilmittelAppApp: App {

@@ -13,14 +13,14 @@ struct StilmittelData: Codable {
 
 class StilmittelViewModel: ObservableObject {
     @Published var stilmittel: [Stilmittel] = []
+    @Published var knownCount = 0
+    @Published var unknownCount = 0
     
     init() {
         loadStilmittelData()
     }
     
     private func loadStilmittelData() {
-        // Change this to "all_stilmittel" if you want to use the file as given
-        // or rename all_stilmittel.json to stilmittel.json and keep stilmittel here.
         guard let url = Bundle.main.url(forResource: "all_stilmittel", withExtension: "json") else {
             print("Could not find all_stilmittel.json in the bundle.")
             return
