@@ -1,3 +1,4 @@
+// ===== StilmittelApp/ContentView.swift =====
 //
 //  ContentView.swift
 //  StilmittelApp
@@ -8,8 +9,8 @@
 import SwiftUI
 
 enum QuizMode: String, CaseIterable {
-    case guessTermByExample = "Guess Term by Example"
-    case guessTermByExplanation = "Guess Term by Explanation"
+    case guessTermByExample = "Guess Example"
+    case guessTermByExplanation = "Guess Explanation"
     case browseAll = "Browse All"
 }
 
@@ -18,7 +19,20 @@ struct ContentView: View {
     @State private var selectedMode: QuizMode = .guessTermByExample
     @State private var currentStilmittel: Stilmittel?
     @State private var showAnswer = false
+    @State private var answered = false  // Track if user has responded known/unknown
+    @State private var searchText = ""   // For searching in browseAll mode
     
+    var filteredStilmittel: [Stilmittel] {
+        viewModel.stilmittel
+            .filter {
+                searchText.isEmpty ||
+                $0.term.lowercased().contains(searchText.lowercased()) ||
+                $0.explanation.lowercased().contains(searchText.lowercased()) ||
+                $0.example.lowercased().contains(searchText.lowercased())
+            }
+            .sorted { $0.term.lowercased() < $1.term.lowercased() }
+    }
+
     var body: some View {
         NavigationView {
             VStack {
@@ -31,7 +45,7 @@ struct ContentView: View {
                 .padding()
                 
                 if selectedMode == .browseAll {
-                    List(viewModel.stilmittel) { s in
+                    List(filteredStilmittel) { s in
                         VStack(alignment: .leading, spacing: 4) {
                             Text(s.term)
                                 .font(.headline)
@@ -42,6 +56,7 @@ struct ContentView: View {
                                 .foregroundColor(.secondary)
                         }
                     }
+                    .searchable(text: $searchText, prompt: "Search Stilmittel")
                 } else {
                     Spacer()
                     if let stilmittel = currentStilmittel {
@@ -62,25 +77,29 @@ struct ContentView: View {
                                         .font(.subheadline)
                                         .padding()
                                     
-                                    // Show thumbs up/down options
+                                    // Show thumbs up/down options once
                                     HStack {
                                         Button(action: {
                                             viewModel.knownCount += 1
+                                            answered = true
                                         }) {
                                             Label("I knew it", systemImage: "hand.thumbsup.fill")
                                                 .padding()
                                                 .background(Color.blue.opacity(0.2))
                                                 .cornerRadius(8)
                                         }
+                                        .disabled(answered)
                                         
                                         Button(action: {
                                             viewModel.unknownCount += 1
+                                            answered = true
                                         }) {
                                             Label("I didn't", systemImage: "hand.thumbsdown.fill")
                                                 .padding()
                                                 .background(Color.red.opacity(0.2))
                                                 .cornerRadius(8)
                                         }
+                                        .disabled(answered)
                                     }
                                     .padding(.top)
                                 }
@@ -102,25 +121,29 @@ struct ContentView: View {
                                         .font(.subheadline)
                                         .padding()
                                     
-                                    // Show thumbs up/down options
+                                    // Show thumbs up/down options once
                                     HStack {
                                         Button(action: {
                                             viewModel.knownCount += 1
+                                            answered = true
                                         }) {
                                             Label("I knew it", systemImage: "hand.thumbsup.fill")
                                                 .padding()
                                                 .background(Color.blue.opacity(0.2))
                                                 .cornerRadius(8)
                                         }
+                                        .disabled(answered)
                                         
                                         Button(action: {
                                             viewModel.unknownCount += 1
+                                            answered = true
                                         }) {
                                             Label("I didn't", systemImage: "hand.thumbsdown.fill")
                                                 .padding()
                                                 .background(Color.red.opacity(0.2))
                                                 .cornerRadius(8)
                                         }
+                                        .disabled(answered)
                                     }
                                     .padding(.top)
                                 }
@@ -133,26 +156,22 @@ struct ContentView: View {
                     
                     Spacer()
                     
-                    HStack {
-                        Button(action: {
-                            // Get a new stilmittel
+                    // Single button at the bottom
+                    Button(action: {
+                        if showAnswer {
+                            // If we were showing the answer, now load a new stilmittel
                             currentStilmittel = viewModel.randomStilmittel()
                             showAnswer = false
-                        }) {
-                            Text("Neu")
-                                .padding()
-                                .background(Color.blue.opacity(0.2))
-                                .cornerRadius(8)
-                        }
-                        
-                        Button(action: {
+                            answered = false
+                        } else {
+                            // If we were not showing the answer, show it now
                             showAnswer = true
-                        }) {
-                            Text("Antwort anzeigen")
-                                .padding()
-                                .background(Color.green.opacity(0.2))
-                                .cornerRadius(8)
                         }
+                    }) {
+                        Text(showAnswer ? "Neu" : "Antwort anzeigen")
+                            .padding()
+                            .background(showAnswer ? Color.blue.opacity(0.2) : Color.green.opacity(0.2))
+                            .cornerRadius(8)
                     }
                     .padding()
                     
